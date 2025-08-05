@@ -8,7 +8,6 @@ import OtpPage from './features/auth/pages/OtpPage';
 import Products from './Products';
 import UploadFile from './UploadFile';
 import Chatbot from './features/chatbot/Chatbot';
-import DataTableWidget from './features/datatable';
 
 const App: React.FC = () => {
   return (
@@ -16,7 +15,6 @@ const App: React.FC = () => {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Products />} />
-        <Route path="/dataTableWidget" element={<DataTableWidget />} />
         <Route path="/chatbot" element={<Chatbot />} />
         <Route path="/file-uploader" element={<UploadFile />} />
         <Route path="/login" element={<LoginPage />} />

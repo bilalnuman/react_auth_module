@@ -8,7 +8,7 @@ interface ApiOptions<T> {
     method?: ApiMethod;
     data?: T;
     showToastError?: boolean;
-    keepPreviousData?: boolean; // pagination/filter fetch flag
+    keepPreviousData?: boolean;
     retry?: number;
     pollInterval?: number;
 }

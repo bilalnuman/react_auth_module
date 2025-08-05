@@ -40,6 +40,18 @@ const LoginPage: React.FC = () => {
         onSubmit={handleSubmit(onSubmit)}
         buttonText="Login"
         formHeader={<div className='text-center pb-3 text-lg uppercase'>login form</div>}
+        formFooter={
+          <>
+            <div className='text-start -mt-2 italic text-sm'>
+              Have already an account? <a href="/register" className="text-blue-600 hover:underline">Register</a>
+            </div>
+            <div className="text-end mb-3">
+              <a href="/forgot-password" className="text-blue-600 text-sm hover:underline">
+                Forgot password?
+              </a>
+            </div>
+          </>
+        }
       />
     </div>
   );

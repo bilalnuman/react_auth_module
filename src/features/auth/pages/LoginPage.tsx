@@ -4,23 +4,28 @@ import { loginSchema, type LoginFormValue } from '../schemas/authSchema';
 import { zodResolver } from '@hookform/resolvers/zod';
 import AuthForm from '../components/AuthForm';
 import { useApi } from '../services/authService';
+import { toast } from 'react-toastify';
+import { formErrorToast } from '../../../util/formErrorToast';
 
 const LoginPage: React.FC = () => {
   const { request, loading } = useApi();
-  const { handleSubmit, control, formState: { errors } } = useForm({
+  const { handleSubmit,reset, control, formState: { errors } } = useForm({
     resolver: zodResolver(loginSchema)
   });
 
   const onSubmit = async (form: LoginFormValue) => {
     const { data, error } = await request({
-      endpoint: '/api/login',
+      endpoint: 'auth/login',
       data: form,
+      method: "POST"
     });
 
-    if (data) {
-      console.log('Login success', data);
+    if (data?.success) {
+      toast.success(data?.message)
+      reset()
     } else {
-      console.log('Login failed:', error);
+      console.log(error)
+      formErrorToast(error)
     }
   };
 

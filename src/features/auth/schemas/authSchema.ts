@@ -21,7 +21,7 @@ export const registerSchema = z
         name: z
             .string("Name is required")
             .min(2, 'Name must be at least 2 characters long')
-            .max(50, 'Name must be less than 50 characters long'),
+            .max(50, 'Name must be less than 50 characters long').optional(),
         email: z
             .string("Email is required")
             .email('Invalid email address')
@@ -29,11 +29,11 @@ export const registerSchema = z
         password: z
             .string('Password is required')
             .min(8, 'Password must be at least 8 characters')
-            .regex(passwordRegex, 'Password must contain at least one uppercase letter, one lowercase letter, and one number'),
+            .regex(passwordRegex, 'Password must contain at least one uppercase letter, one lowercase letter, and one number').optional(),
         confirmPassword: z
             .string('Confirm password is required')
             .min(8, 'Confirm Password must be at least 8 characters')
-            .regex(passwordRegex, 'Password must contain at least one uppercase letter, one lowercase letter, and one number'),
+            .regex(passwordRegex, 'Password must contain at least one uppercase letter, one lowercase letter, and one number').optional(),
     })
     .superRefine(({ password, confirmPassword }, ctx) => {
         if (password !== confirmPassword) {

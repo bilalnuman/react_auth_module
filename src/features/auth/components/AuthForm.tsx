@@ -20,7 +20,7 @@ interface AuthFormProps {
 }
 
 const AuthForm: React.FC<AuthFormProps> = ({ fields, errors, isSubmitting, onSubmit, formHeader, formFooter, buttonText, control }) => {
-  console.log(fields, 'fields')
+ 
   return (
     <div className=' max-w-md bg-white p-6 rounded shadow-md w-full'>
       {formHeader && formHeader}

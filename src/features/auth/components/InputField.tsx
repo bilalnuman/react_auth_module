@@ -18,7 +18,7 @@ interface InputFieldProps {
 
 const InputField = React.forwardRef<HTMLInputElement, InputFieldProps>(
     ({ label, name, type = 'text', error, value, onChange, onBlur, icon, fieldMeta, iconPosition = "right", enablePasswordToggle = false, ...rest }, ref) => {
-        console.log(fieldMeta, 'fieldMeta')
+
         const [secure, setSecure] = useState<boolean>(false);
         return (
             <div className="mb-4">
@@ -28,6 +28,7 @@ const InputField = React.forwardRef<HTMLInputElement, InputFieldProps>(
                 <div className='relative'>
                     <span className={`absolute top-1/2 -translate-y-1/2 z-10 ${iconPosition === 'left' ? "start-3" : "end-3"}`}>{icon}</span>
                     <input
+                        {...fieldMeta}
                         id={name}
                         type={secure ? 'text' : type}
                         value={value ?? ""}
@@ -38,7 +39,7 @@ const InputField = React.forwardRef<HTMLInputElement, InputFieldProps>(
                         className={`${iconPosition === 'left' ? "ps-8" : ""} w-full px-3 py-2 border rounded-md focus:outline-none relative focus:ring-2 ${error ? 'border-red-500 focus:ring-red-300' : 'border-gray-300 focus:ring-blue-300'
                             }`}
                         {...rest}
-                        {...fieldMeta}
+
                     />
                     {enablePasswordToggle &&
                         <button type='button' onClick={() => setSecure(!secure)} className=' absolute end-3 top-1/2 -translate-y-1/2'>

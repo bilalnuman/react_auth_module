@@ -1,62 +1,221 @@
 import React, { useEffect, useState } from 'react';
 import { useApi } from './features/auth/services/authService';
-import { useSearchParams } from 'react-router-dom';
+import { DataTable, type Column } from './features/datatable';
+import styles from './features/datatable/DataTable.module.css';
 
 interface Post {
     id: number;
     title: string;
     body: string;
+    userId: number;
 }
 
+const BASE_API_URL = import.meta.env.VITE_API_BASE_URL
+
 const Products = () => {
-    const { request, loading, isFetching, data, error } = useApi<undefined, Post[]>();
-    const [searchParams, setSearchParams] = useSearchParams();
-
-    // Initial page from URL or 1
-    const initialPage = Number(searchParams.get('page')) || 1;
-    const [page, setPage] = useState(initialPage);
-
-    // Sync URL with page state
-    useEffect(() => {
-        setSearchParams({ page: page.toString() });
-    }, [page, setSearchParams]);
-
-    // Fetch posts on page change, keepPreviousData true so old posts remain during loading
+    const { request, loading, data, error } = useApi<undefined, Post[]>();
+    const [selectedPosts, setSelectedPosts] = useState<Set<string | number>>(new Set());
+    const [showCheckboxes, setShowCheckboxes] = useState(true);
+    console.log(BASE_API_URL)
+    // Fetch all posts at once for demonstration
     useEffect(() => {
         request({
-            endpoint: `https://jsonplaceholder.typicode.com/posts?_page=${page}&_limit=30`,
+            endpoint: 'https://jsonplaceholder.typicode.com/posts',
             method: 'GET',
             keepPreviousData: true,
-            showToastError: false, // Optional: avoid toast on fetch error
+            showToastError: false,
         });
-    }, [page, request]);
+    }, [request]);
+
+    // Action handlers
+    const handleViewPost = (post: Post) => {
+        alert(`Viewing post: ${post.title}`);
+        // In a real app, you might navigate to a detail page or open a modal
+        console.log('View post:', post);
+    };
+
+    const handleEditPost = (post: Post) => {
+        console.log(post)
+        alert(`Editing post: ${post.title}`);
+        // In a real app, you might navigate to an edit form or open a modal
+        console.log('Edit post:', post);
+    };
+
+    const handleDeletePost = (post: Post) => {
+        const confirmed = window.confirm(`Are you sure you want to delete "${post.title}"?`);
+        if (confirmed) {
+            alert(`Deleted post: ${post.title}`);
+            // In a real app, you would make an API call to delete the post
+            console.log('Delete post:', post);
+        }
+    };
+
+    // Define table columns
+    const columns: Column<Post>[] = [
+        {
+            key: 'id',
+            label: 'ID',
+            sortable: true,
+        },
+        {
+            key: 'userId',
+            label: 'User ID',
+            sortable: true,
+        },
+        {
+            key: 'title',
+            label: 'Title',
+            sortable: true,
+            render: (value: string) => (
+                <div style={{ maxWidth: '300px' }}>
+                    <strong>{value}</strong>
+                </div>
+            ),
+        },
+        {
+            key: 'body',
+            label: 'Content',
+            sortable: true,
+            render: (value: string) => (
+                <div style={{
+                    maxWidth: '400px',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    whiteSpace: 'nowrap'
+                }}>
+                    {value}
+                </div>
+            ),
+        },
+        {
+            key: 'id',
+            label: 'Actions',
+            sortable: false,
+            render: (value: number, post: Post) => (
+                <div className={styles.actionsContainer}>
+                    <button
+                        onClick={() => handleViewPost(post)}
+                        className={`${styles.actionButton} ${styles.primary}`}
+                        title="View Post"
+                    >
+                        👁️
+                    </button>
+                    <button
+                        onClick={() => handleEditPost(post)}
+                        className={`${styles.actionButton} ${styles.success}`}
+                        title="Edit Post"
+                    >
+                        ✏️
+                    </button>
+                    <button
+                        onClick={() => handleDeletePost(post)}
+                        className={`${styles.actionButton} ${styles.danger}`}
+                        title="Delete Post"
+                    >
+                        🗑️
+                    </button>
+                </div>
+            ),
+        },
+    ];
+
+    const handleSelectionChange = (selected: Set<string | number>) => {
+        setSelectedPosts(selected);
+    };
+
+    const handleBulkAction = (action: string) => {
+        if (selectedPosts.size === 0) {
+            alert('Please select some posts first');
+            return;
+        }
+
+        const selectedIds = Array.from(selectedPosts);
+        alert(`${action} action for posts: ${selectedIds.join(', ')}`);
+    };
 
     return (
-        <div>
-            <h2>Page: {page}</h2>
+        <div style={{ padding: '1rem', maxWidth: '1200px', margin: '0 auto' }}>
+            <div style={{ marginBottom: '1rem' }}>
+                <h1 style={{ fontSize: '1.5rem', fontWeight: 'bold', marginBottom: '1rem' }}>
+                    Posts Data Table
+                </h1>
 
-            <button
-                onClick={() => setPage((p) => Math.max(p - 1, 1))}
-                disabled={page === 1 || loading}
-            >
-                Prev
-            </button>
-            <button onClick={() => setPage((p) => p + 1)} disabled={loading}>
-                Next
-            </button>
+                {/* Controls */}
+                <div style={{
+                    display: 'flex',
+                    gap: '1rem',
+                    alignItems: 'center',
+                    marginBottom: '1rem',
+                    flexWrap: 'wrap'
+                }}>
+                    <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                        <input
+                            type="checkbox"
+                            checked={showCheckboxes}
+                            onChange={(e) => setShowCheckboxes(e.target.checked)}
+                        />
+                        Enable Selection
+                    </label>
 
-            {loading &&  !data && <p>Loading...</p>}
-            {error && <p className="text-red-600">Error: {error}</p>}
+                    {showCheckboxes && selectedPosts.size > 0 && (
+                        <div style={{ display: 'flex', gap: '0.5rem' }}>
+                            <button
+                                onClick={() => handleBulkAction('Delete')}
+                                style={{
+                                    padding: '0.5rem 1rem',
+                                    backgroundColor: '#dc2626',
+                                    color: 'white',
+                                    border: 'none',
+                                    borderRadius: '4px',
+                                    cursor: 'pointer'
+                                }}
+                            >
+                                Delete Selected
+                            </button>
+                            <button
+                                onClick={() => handleBulkAction('Archive')}
+                                style={{
+                                    padding: '0.5rem 1rem',
+                                    backgroundColor: '#059669',
+                                    color: 'white',
+                                    border: 'none',
+                                    borderRadius: '4px',
+                                    cursor: 'pointer'
+                                }}
+                            >
+                                Archive Selected
+                            </button>
+                        </div>
+                    )}
+                </div>
+            </div>
 
-            <ul>
-                {data &&
-                    data.map((post) => (
-                        <li key={post.id}>
-                            <strong>{post.title}</strong>
-                            <p>{post.body}</p>
-                        </li>
-                    ))}
-            </ul>
+            {error && (
+                <div style={{
+                    padding: '1rem',
+                    backgroundColor: '#fef2f2',
+                    color: '#dc2626',
+                    borderRadius: '4px',
+                    marginBottom: '1rem'
+                }}>
+                    Error: {error}
+                </div>
+            )}
+
+            <DataTable
+                data={data || []}
+                columns={columns}
+                loading={loading}
+                options={{
+                    itemsPerPage: 10,
+                    defaultSortKey: 'id',
+                    defaultSortDirection: 'asc',
+                    enableSelection: showCheckboxes,
+                }}
+                onSelectionChange={handleSelectionChange}
+
+
+            />
         </div>
     );
 };

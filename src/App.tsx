@@ -15,6 +15,7 @@ const App: React.FC = () => {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Products />} />
+        <Route path="/dataTableWidget" element={<Products />} />
         <Route path="/chatbot" element={<Chatbot />} />
         <Route path="/file-uploader" element={<UploadFile />} />
         <Route path="/login" element={<LoginPage />} />

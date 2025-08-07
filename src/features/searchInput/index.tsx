@@ -22,7 +22,8 @@ interface Props {
     isIconInside?: boolean,
     iconClassName?: string;
     keyName?: string;
-    isIcon?: boolean
+    isIcon?: boolean,
+    delay?: number;
 }
 
 export type SearchInputRef = {
@@ -44,7 +45,8 @@ const SearchInput = forwardRef<SearchInputRef, Props>(({
     isIcon = true,
     disabledClass = '',
     iconClassName = '',
-    keyName = 'search'
+    keyName = 'search',
+    delay = 500
 }, ref) => {
     const inputRef = useRef<HTMLInputElement>(null);
     const params = new URLSearchParams(window.location.search);
@@ -54,7 +56,7 @@ const SearchInput = forwardRef<SearchInputRef, Props>(({
         debounce((value: string) => {
             onChange?.(value?.trim())
             !value.length && resetSearch()
-        }, 300),
+        }, delay),
         [onChange]
     );
 

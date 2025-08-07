@@ -9,6 +9,8 @@ const SearchInputDebounce = () => {
     const searchRef = useRef<SearchInputRef>(null);
     const { setFilter, groupedQueries, params, page, gotoPage, clearFilters, setFilters } = useSearchQuery();
 
+    console.log(params)
+
 
     const applyFilters = () => {
         setFilters(
@@ -33,7 +35,7 @@ const SearchInputDebounce = () => {
             <div>
                 <SearchInput
                     ref={searchRef}
-                    onClick={(value) => setFilter('search', value, { resetFilters: true })}
+                    onChange={(value) => setFilter('search', value, { resetFilters: true })}
                     className='w-[300px]'
                     isIconInside={false}
                     iconPosition='right'

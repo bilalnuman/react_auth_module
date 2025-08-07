@@ -1,0 +1,59 @@
+.inputContainer {
+    display: flex;
+    margin-top: 10px;
+    position: relative;
+    gap: 6px;
+    align-items: center;
+}
+
+.inputField {
+    flex: 1;
+    padding: 8px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+    font-size: 14px;
+}
+
+.inputField:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px #93c5fd;
+}
+
+.inputContainer button span {
+    min-width: 16px;
+    height: 16px;
+    border: 2px solid #ccc;
+    border-radius: 50%;
+    position: absolute;
+    right: 12px;
+}
+
+.searchIcon {}
+
+.iconInside {}
+.iconOutside {
+    background: rgb(0, 145, 255);
+    border-bottom-right-radius: 5px;
+    border-top-right-radius: 5px;
+}
+
+.inputContainer button {
+    position: absolute;
+    width: 40px;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.inputContainer button span::after {
+    content: '';
+    position: absolute;
+    width: 10px;
+    height: 2px;
+    background: #ccc;
+    top: 10px;
+    left: 10px;
+    transform: rotate(45deg);
+    transform-origin: left top;
+}

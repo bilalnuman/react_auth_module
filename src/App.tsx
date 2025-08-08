@@ -9,6 +9,7 @@ import Products from './Products';
 import UploadFile from './UploadFile';
 import Chatbot from './features/chatbot/Chatbot';
 import SearchInputDebounce from './features/searchInput/Filter';
+import { Charts } from './features/charts';
 
 const App: React.FC = () => {
   return (
@@ -16,6 +17,7 @@ const App: React.FC = () => {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Products />} />
+        <Route path="/charts" element={<Charts />} />
         <Route path="/dataTableWidget" element={<Products />} />
         <Route path="/searchInput" element={<SearchInputDebounce />} />
         <Route path="/chatbot" element={<Chatbot />} />

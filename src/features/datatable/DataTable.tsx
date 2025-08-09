@@ -1,15 +1,6 @@
 import React from 'react';
-import { type Column, useDataTable, type DataTableOptions } from '../../hooks/useDataTable';
+import { type Column, useDataTable, type DataTableProps } from '../../hooks/useDataTable';
 import styles from './DataTable.module.css';
-
-interface DataTableProps<T> {
-  data: T[];
-  columns: Column<T>[];
-  options?: DataTableOptions;
-  loading?: boolean;
-  onSelectionChange?: (selectedItems: Set<string | number>) => void;
-  className?: string;
-}
 
 function DataTable<T extends Record<string, any>>({
   data,
@@ -50,10 +41,19 @@ function DataTable<T extends Record<string, any>>({
     }
   }, [selectedItems, onSelectionChange]);
 
-  const getSortIcon = (columnKey: keyof T) => {
-    if (sortKey !== columnKey) return '↕️';
-    return sortDirection === 'asc' ? '↑' : '↓';
+  const getSortIcon = (column: Column<T>) => {
+    const isSorted = sortKey === column.key;
+    const direction = isSorted ? sortDirection : null;
+
+    if (column.getSortIcon) {
+      return column.getSortIcon(direction);
+    }
+
+    // Fallback default icons
+    if (!isSorted) return '↕️';
+    return direction === 'asc' ? '↑' : '↓';
   };
+
 
   const renderPaginationInfo = () => {
     const start = (currentPage - 1) * itemsPerPage + 1;
@@ -64,10 +64,10 @@ function DataTable<T extends Record<string, any>>({
   const renderPaginationButtons = () => {
     const buttons = [];
     const maxVisiblePages = 5;
-    
+
     let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
     let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
-    
+
     if (endPage - startPage + 1 < maxVisiblePages) {
       startPage = Math.max(1, endPage - maxVisiblePages + 1);
     }
@@ -127,7 +127,7 @@ function DataTable<T extends Record<string, any>>({
                     >
                       <span>{column.label}</span>
                       <span className={styles.sortIcon}>
-                        {getSortIcon(column.key)}
+                        {getSortIcon(column)}
                       </span>
                     </button>
                   ) : (
@@ -140,8 +140,8 @@ function DataTable<T extends Record<string, any>>({
           <tbody>
             {currentItems.length === 0 ? (
               <tr>
-                <td 
-                  colSpan={columns.length + (options.enableSelection ? 1 : 0)} 
+                <td
+                  colSpan={columns.length + (options.enableSelection ? 1 : 0)}
                   className={styles.emptyCell}
                 >
                   No data available
@@ -151,8 +151,8 @@ function DataTable<T extends Record<string, any>>({
               currentItems.map((item) => {
                 const id = getItemId(item);
                 return (
-                  <tr 
-                    key={String(id)} 
+                  <tr
+                    key={String(id)}
                     className={`${styles.row} ${isSelected(id) ? styles.selectedRow : ''}`}
                   >
                     {options.enableSelection && (
@@ -168,7 +168,7 @@ function DataTable<T extends Record<string, any>>({
                     )}
                     {columns.map((column) => (
                       <td key={String(column.key)} className={styles.td}>
-                        {column.render 
+                        {column.render
                           ? column.render(item[column.key], item)
                           : String(item[column.key] || '')
                         }
@@ -188,7 +188,7 @@ function DataTable<T extends Record<string, any>>({
           <div className={styles.paginationInfo}>
             {renderPaginationInfo()}
           </div>
-          
+
           <div className={styles.paginationControls}>
             <button
               onClick={prevPage}
@@ -197,9 +197,9 @@ function DataTable<T extends Record<string, any>>({
             >
               ← Previous
             </button>
-            
+
             {renderPaginationButtons()}
-            
+
             <button
               onClick={nextPage}
               disabled={!canGoNext || loading}
@@ -215,7 +215,7 @@ function DataTable<T extends Record<string, any>>({
       {options.enableSelection && selectedItems.size > 0 && (
         <div className={styles.selectionSummary}>
           <span>{selectedItems.size} item(s) selected</span>
-          <button 
+          <button
             onClick={clearSelection}
             className={styles.clearButton}
             disabled={loading}

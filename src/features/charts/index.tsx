@@ -28,7 +28,7 @@ export const formatCurrency = (
 
 // ----- LINE CHART -----
 export const LineChart: React.FC<ChartProps> = () => {
-    
+
     const data: ChartData<'line'> = {
         labels: ['Jan', 'Feb', 'Mar', 'Apr'],
         datasets: [
@@ -43,7 +43,25 @@ export const LineChart: React.FC<ChartProps> = () => {
     };
 
     const options: ChartOptions<'line'> = {
-        plugins: { legend: { display: true } },
+        plugins: {
+            legend: {
+                display: true,
+                position: 'bottom',
+                align: 'center',
+                labels: {
+                    usePointStyle: true,
+                    pointStyle: 'circle',
+                    color: '#4CAF50',
+                    boxWidth: 20,
+                    padding: 15,
+                    font: {
+                        size: 14,
+                        weight: 'bold',
+                    },
+                },
+            },
+            
+        },
     };
 
     return (
@@ -51,8 +69,10 @@ export const LineChart: React.FC<ChartProps> = () => {
             type="line"
             data={data}
             options={options}
+
             showLegend={true}
             showAxisLabels={true}
+
         />
     );
 };
@@ -66,14 +86,14 @@ export const MultiLineChart: React.FC = () => {
         datasets: [
             {
                 label: 'Sales',
-                data: [1200, 1900, 1700, 2100, 2300],
+                data: [0, 1900, 1700, 2100, 2300],
                 borderColor: '#36A2EB',
                 backgroundColor: 'rgba(54, 162, 235, 0.2)',
                 tension: 0.4,
             },
             {
                 label: 'Expenses',
-                data: [800, 1100, 900, 1300, 1250],
+                data: [8, 1100, 900, 1300, 1250],
                 borderColor: '#FF6384',
                 backgroundColor: 'rgba(255, 99, 132, 0.2)',
                 tension: 0.4,
@@ -195,7 +215,7 @@ export const DoughnutChart: React.FC<ChartProps> = () => {
 // ----- CHART CONTAINER -----
 export const Charts: React.FC = () => {
     return (
-        <div className="charts grid gap-10 justify-center">
+        <div className="charts grid gap-10 ">
             <h2>Line Chart</h2>
             <LineChart />
 

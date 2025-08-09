@@ -1,0 +1,109 @@
+.sidebar {
+  background: #1f2937;
+  color: white;
+  min-width: 250px;
+  max-width: 250px;
+  transition: width 0.3s ease;
+  overflow: auto;
+  margin-right: 20px;
+  top: 0;
+  position: sticky;
+  height: 100vh;
+  align-self: flex-start;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  z-index: 50;
+}
+
+.sidebar::-webkit-scrollbar {
+  display: none;
+}
+
+.closed {
+  width: 60px;
+}
+
+.logo {
+  padding: 1rem;
+  text-align: center;
+}
+
+.logo img {
+  max-width: 100%;
+  height: auto;
+}
+
+.menu {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.menuItem {
+  display: flex;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  cursor: pointer;
+  text-decoration: none;
+  color: white;
+  transition: background 0.2s;
+  justify-content: space-between;
+  text-transform: capitalize;
+}
+
+.menuItem:hover {
+  background: #374151;
+}
+
+.menuItem.active {
+  background: #4b5563;
+}
+
+.icon {
+  margin-right: 0.5rem;
+}
+
+.subMenu {
+  max-height: 0;
+  overflow: hidden;
+  transition:
+    max-height 0.4s ease,
+    opacity 0.3s ease 0.1s,
+    padding 0.3s ease;
+}
+
+.subMenuOpen {
+  max-height: 500px;
+  opacity: 1;
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+  text-transform: capitalize;
+}
+
+.subMenuItem {
+  display: flex;
+  align-items: center;
+  padding: 0.5rem 1rem 0.5rem 2rem;
+  color: white;
+  text-decoration: none;
+}
+
+.subMenuItem.active {
+  color: #60a5fa;
+  font-weight: bold;
+}
+
+.subMenuItem:hover {
+  background: #374151;
+}
+
+.caret {
+  transition: transform 0.3s ease;
+  color: white;
+  display: flex;
+  align-items: center;
+}
+
+.caretOpen {
+  transform: rotate(180deg);
+}

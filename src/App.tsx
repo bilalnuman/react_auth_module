@@ -10,23 +10,93 @@ import UploadFile from './UploadFile';
 import Chatbot from './features/chatbot/Chatbot';
 import SearchInputDebounce from './features/searchInput/Filter';
 import { Charts } from './features/charts';
+import Sidebar from './features/sidebar/sidebar';
 
 const App: React.FC = () => {
   return (
 
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<Products />} />
-        <Route path="/charts" element={<Charts />} />
-        <Route path="/dataTableWidget" element={<Products />} />
-        <Route path="/searchInput" element={<SearchInputDebounce />} />
-        <Route path="/chatbot" element={<Chatbot />} />
-        <Route path="/file-uploader" element={<UploadFile />} />
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/register" element={<RegisterPage />} />
-        <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-        <Route path="/reset-password" element={<ResetPasswordPage />} />
-        <Route path="/otp" element={<OtpPage />} />
+        <Route path="/" element={
+          <div className='flex'>
+            <Sidebar />
+            <div className='flex-1'><Products /></div>
+          </div>
+        } />
+        <Route path="/charts" element={
+          <div className='flex'>
+            <Sidebar />
+            <div className='flex-1'><Charts /></div>
+          </div>
+        } />
+        <Route path="/users" element={<div>
+          <div>
+            <Sidebar />
+            <h2>All users</h2>
+          </div>
+        </div>} />
+        <Route path="/users/add" element={<div>
+          <div>
+            <Sidebar />
+            <h2>Add users</h2>
+          </div>
+        </div>} />
+
+
+        <Route path="/dataTableWidget" element={
+          <div className='flex'>
+            <Sidebar />
+            <div className='flex-1'><Products /></div>
+          </div>
+        } />
+        <Route path="/searchInput" element={
+          <div className='flex'>
+            <Sidebar />
+            <div className='flex-1'><SearchInputDebounce /></div>
+          </div>
+        } />
+        <Route path="/chatbot" element={
+          <div className='flex'>
+            <Sidebar />
+            <div className='flex-1'><Chatbot /></div>
+          </div>
+        } />
+        <Route path="/file-uploader" element={
+          <div className='flex'>
+            <Sidebar />
+            <div className='flex-1'><UploadFile /></div>
+          </div>
+        } />
+        <Route path="/login" element={
+          <div className='flex'>
+            <Sidebar />
+            <div className='flex-1'><LoginPage /></div>
+          </div>
+        } />
+        <Route path="/register" element={
+          <div className='flex'>
+            <Sidebar />
+            <div className='flex-1'><RegisterPage /></div>
+          </div>
+        } />
+        <Route path="/forgot-password" element={
+          <div className='flex'>
+            <Sidebar />
+            <div className='flex-1'><ForgotPasswordPage /></div>
+          </div>
+        } />
+        <Route path="/reset-password" element={
+          <div className='flex'>
+            <Sidebar />
+            <div className='flex-1'><ResetPasswordPage /></div>
+          </div>
+        } />
+        <Route path="/otp" element={
+          <div className='flex'>
+            <Sidebar />
+            <div className='flex-1'><OtpPage /></div>
+          </div>
+        } />
       </Routes>
     </BrowserRouter>
   );

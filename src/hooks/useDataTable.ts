@@ -1,12 +1,20 @@
 import { useState, useMemo, useCallback } from 'react';
-
+export type Direction = 'desc' | 'asc' | null;
 export interface Column<T> {
   key: keyof T;
   label: string;
   sortable?: boolean;
   render?: (value: any, item: T) => React.ReactNode;
+  getSortIcon?: (direction: 'asc' | 'desc' | null) => React.ReactNode;
 }
-
+export interface DataTableProps<T> {
+  data: T[];
+  columns: Column<T>[];
+  options?: DataTableOptions;
+  loading?: boolean;
+  onSelectionChange?: (selectedItems: Set<string | number>) => void;
+  className?: string;
+}
 export interface DataTableOptions {
   itemsPerPage?: number;
   defaultSortKey?: string;
@@ -19,7 +27,7 @@ export interface UseDataTableReturn<T> {
   currentItems: T[];
   totalItems: number;
   totalPages: number;
-  
+
   // Pagination
   currentPage: number;
   itemsPerPage: number;
@@ -28,12 +36,12 @@ export interface UseDataTableReturn<T> {
   prevPage: () => void;
   canGoNext: boolean;
   canGoPrev: boolean;
-  
+
   // Sorting
   sortKey: keyof T | null;
   sortDirection: 'asc' | 'desc';
   handleSort: (key: keyof T) => void;
-  
+
   // Selection
   selectedItems: Set<string | number>;
   isSelected: (id: string | number) => boolean;
@@ -42,7 +50,7 @@ export interface UseDataTableReturn<T> {
   clearSelection: () => void;
   isAllSelected: boolean;
   isIndeterminate: boolean;
-  
+
   // Utility
   getItemId: (item: T) => string | number;
 }
@@ -169,7 +177,7 @@ export function useDataTable<T extends Record<string, any>>(
     currentItems,
     totalItems,
     totalPages,
-    
+
     // Pagination
     currentPage,
     itemsPerPage,
@@ -178,12 +186,12 @@ export function useDataTable<T extends Record<string, any>>(
     prevPage,
     canGoNext,
     canGoPrev,
-    
+
     // Sorting
     sortKey,
     sortDirection,
     handleSort,
-    
+
     // Selection
     selectedItems,
     isSelected,
@@ -192,7 +200,7 @@ export function useDataTable<T extends Record<string, any>>(
     clearSelection,
     isAllSelected,
     isIndeterminate,
-    
+
     // Utility
     getItemId
   };

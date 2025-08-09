@@ -1,7 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useApi } from './features/auth/services/authService';
 import { DataTable, type Column } from './features/datatable';
 import styles from './features/datatable/DataTable.module.css';
+import { FaSort, FaSortDown, FaSortUp } from 'react-icons/fa';
+import type { Direction } from './hooks/useDataTable';
+import useSearchQuery from './util/querySearch';
 
 interface Post {
     id: number;
@@ -10,17 +13,15 @@ interface Post {
     userId: number;
 }
 
-const BASE_API_URL = import.meta.env.VITE_API_BASE_URL
-
 const Products = () => {
+    // const { page, gotoPage } = useSearchQuery();
     const { request, loading, data, error } = useApi<undefined, Post[]>();
     const [selectedPosts, setSelectedPosts] = useState<Set<string | number>>(new Set());
     const [showCheckboxes, setShowCheckboxes] = useState(true);
-    console.log(BASE_API_URL)
-    // Fetch all posts at once for demonstration
+
     useEffect(() => {
         request({
-            endpoint: 'https://jsonplaceholder.typicode.com/posts',
+            endpoint: 'posts',
             method: 'GET',
             keepPreviousData: true,
             showToastError: false,
@@ -50,22 +51,32 @@ const Products = () => {
         }
     };
 
+    const getSortIcon = (direction: Direction) => {
+        if (direction === 'asc') return <FaSortUp />;
+        if (direction === 'desc') return <FaSortDown />;
+        return <FaSort />;
+    };
+
+
     // Define table columns
     const columns: Column<Post>[] = [
         {
             key: 'id',
             label: 'ID',
             sortable: true,
+            getSortIcon: (direction: Direction) => getSortIcon(direction)
         },
         {
             key: 'userId',
             label: 'User ID',
             sortable: true,
+            getSortIcon: (direction: Direction) => getSortIcon(direction)
         },
         {
             key: 'title',
             label: 'Title',
             sortable: true,
+            getSortIcon: (direction: Direction) => getSortIcon(direction),
             render: (value: string) => (
                 <div style={{ maxWidth: '300px' }}>
                     <strong>{value}</strong>
@@ -76,6 +87,7 @@ const Products = () => {
             key: 'body',
             label: 'Content',
             sortable: true,
+            getSortIcon: (direction: Direction) => getSortIcon(direction),
             render: (value: string) => (
                 <div style={{
                     maxWidth: '400px',
@@ -213,8 +225,6 @@ const Products = () => {
                     enableSelection: showCheckboxes,
                 }}
                 onSelectionChange={handleSelectionChange}
-
-
             />
         </div>
     );

@@ -73,66 +73,73 @@ const ReusableChart: React.FC<ReusableChartProps> = ({
     const ChartComponent = chartComponents[type] || Line;
 
     const mergedOptions: ChartOptions = {
+        ...options, // Spread the base options first
         responsive: true,
         plugins: {
+            ...options.plugins, // Spread existing plugins
             legend: {
                 display: showLegend,
+                ...options.plugins?.legend, // Allow overriding legend settings
             },
             tooltip: {
+                ...options.plugins?.tooltip, // Spread existing tooltip settings
                 callbacks: {
+                    ...options.plugins?.tooltip?.callbacks, // Preserve existing callbacks
                     label: (context) => {
                         const label = context.dataset.label ?? '';
                         let value: number | undefined;
 
-                        if (context.parsed) {
-                            if (typeof context.parsed === 'number') {
-                                value = context.parsed;
-                            } else if (typeof context.parsed === 'object' && context.parsed !== null) {
-                                value = typeof context.parsed.y === 'number' ? context.parsed.y : undefined;
-                            }
-                        }
-
-                        if (value === undefined && typeof context.raw === 'number') {
+                        // Extract the actual numeric value from different possible sources
+                        if (context.parsed && typeof context.parsed === 'object' && context.parsed !== null) {
+                            // For line/bar charts, the value is in context.parsed.y
+                            value = context.parsed.y as number;
+                        } else if (typeof context.parsed === 'number') {
+                            // For pie/doughnut charts, the value is directly in context.parsed
+                            value = context.parsed;
+                        } else if (typeof context.raw === 'number') {
+                            // Fallback to raw value
                             value = context.raw;
                         }
 
-                        if (value === undefined) {
-                            return `${label}: ${context.raw}`;
-                        }
+                        // Debug logging
+                        console.log('Tooltip Debug:', {
+                            label,
+                            value,
+                            formatValueExists: !!formatValue,
+                            parsed: context.parsed,
+                            raw: context.raw
+                        });
 
-                        const formatted = formatValue ? formatValue(value) : value;
+                        // Format the value if formatValue function is provided
+                        const formatted = formatValue && typeof value === 'number' 
+                            ? formatValue(value) 
+                            : (value ?? context.raw);
 
-                        console.log(`Formatted Value: ${formatted}`);
-
-                        // **RETURN AN ARRAY** for tooltip label, this avoids any glitch:
-                        return [`${label}: ${formatted}`];
+                        return `${label}: ${formatted}`;
                     }
-
-                },
-                ...options.plugins?.tooltip,
+                }
             },
-
-
-            ...options.plugins,
         },
         scales: {
+            ...options.scales, // Spread existing scales
             x: {
+                ...options.scales?.x, // Preserve existing x-axis settings
                 ticks: {
+                    ...options.scales?.x?.ticks, // Preserve existing x-axis ticks
                     display: showAxisLabels,
                 },
-                ...options.scales?.x,
             },
             y: {
+                ...options.scales?.y, // Preserve existing y-axis settings
                 ticks: {
+                    ...options.scales?.y?.ticks, // Preserve existing y-axis ticks
                     display: showAxisLabels,
                     callback: (value: any) => {
                         return formatValue ? formatValue(Number(value)) : value;
                     },
                 },
-                ...options.scales?.y,
             },
         },
-        ...options,
     };
 
 

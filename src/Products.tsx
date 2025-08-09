@@ -5,6 +5,7 @@ import styles from './features/datatable/DataTable.module.css';
 import { FaSort, FaSortDown, FaSortUp } from 'react-icons/fa';
 import type { Direction } from './hooks/useDataTable';
 import useSearchQuery from './util/querySearch';
+import Pagination from './features/datatable/Pagination';
 
 interface Post {
     id: number;
@@ -14,7 +15,7 @@ interface Post {
 }
 
 const Products = () => {
-    // const { page, gotoPage } = useSearchQuery();
+    const { page, gotoPage } = useSearchQuery();
     const { request, loading, data, error } = useApi<undefined, Post[]>();
     const [selectedPosts, setSelectedPosts] = useState<Set<string | number>>(new Set());
     const [showCheckboxes, setShowCheckboxes] = useState(true);
@@ -219,11 +220,19 @@ const Products = () => {
                 columns={columns}
                 loading={loading}
                 options={{
-                    itemsPerPage: 10,
                     defaultSortKey: 'id',
                     defaultSortDirection: 'asc',
                     enableSelection: showCheckboxes,
                 }}
+                paginationComponent={
+                    <div className='my-5 w-full flex justify-center items-center'>
+                        <Pagination
+                            currentPage={page}
+                            totalPages={100}
+                            goToPage={gotoPage}
+                        />
+                    </div>
+                }
                 onSelectionChange={handleSelectionChange}
             />
         </div>

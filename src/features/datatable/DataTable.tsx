@@ -8,19 +8,11 @@ function DataTable<T extends Record<string, any>>({
   options = {},
   loading = false,
   onSelectionChange,
-  className = ''
+  className = '',
+  paginationComponent,
 }: DataTableProps<T>) {
   const {
     currentItems,
-    totalItems,
-    totalPages,
-    currentPage,
-    itemsPerPage,
-    goToPage,
-    nextPage,
-    prevPage,
-    canGoNext,
-    canGoPrev,
     sortKey,
     sortDirection,
     handleSort,
@@ -31,10 +23,10 @@ function DataTable<T extends Record<string, any>>({
     clearSelection,
     isAllSelected,
     isIndeterminate,
-    getItemId
+    getItemId,
   } = useDataTable(data, options);
 
-  // Notify parent of selection changes
+ 
   React.useEffect(() => {
     if (onSelectionChange) {
       onSelectionChange(selectedItems);
@@ -49,43 +41,9 @@ function DataTable<T extends Record<string, any>>({
       return column.getSortIcon(direction);
     }
 
-    // Fallback default icons
+    
     if (!isSorted) return '↕️';
     return direction === 'asc' ? '↑' : '↓';
-  };
-
-
-  const renderPaginationInfo = () => {
-    const start = (currentPage - 1) * itemsPerPage + 1;
-    const end = Math.min(currentPage * itemsPerPage, totalItems);
-    return `${start}-${end} of ${totalItems}`;
-  };
-
-  const renderPaginationButtons = () => {
-    const buttons = [];
-    const maxVisiblePages = 5;
-
-    let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
-    let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
-
-    if (endPage - startPage + 1 < maxVisiblePages) {
-      startPage = Math.max(1, endPage - maxVisiblePages + 1);
-    }
-
-    for (let i = startPage; i <= endPage; i++) {
-      buttons.push(
-        <button
-          key={i}
-          onClick={() => goToPage(i)}
-          className={`${styles.pageButton} ${i === currentPage ? styles.active : ''}`}
-          disabled={loading}
-        >
-          {i}
-        </button>
-      );
-    }
-
-    return buttons;
   };
 
   if (loading && data.length === 0) {
@@ -182,36 +140,13 @@ function DataTable<T extends Record<string, any>>({
         </table>
       </div>
 
-      {/* Pagination */}
-      {totalPages > 1 && (
-        <div className={styles.pagination}>
-          <div className={styles.paginationInfo}>
-            {renderPaginationInfo()}
-          </div>
-
-          <div className={styles.paginationControls}>
-            <button
-              onClick={prevPage}
-              disabled={!canGoPrev || loading}
-              className={styles.navButton}
-            >
-              ← Previous
-            </button>
-
-            {renderPaginationButtons()}
-
-            <button
-              onClick={nextPage}
-              disabled={!canGoNext || loading}
-              className={styles.navButton}
-            >
-              Next →
-            </button>
-          </div>
+      
+      {paginationComponent && (
+        <div className={styles.paginationWrapper}>
+          {paginationComponent}
         </div>
       )}
 
-      {/* Selection Summary */}
       {options.enableSelection && selectedItems.size > 0 && (
         <div className={styles.selectionSummary}>
           <span>{selectedItems.size} item(s) selected</span>

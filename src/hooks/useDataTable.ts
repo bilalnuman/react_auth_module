@@ -1,5 +1,7 @@
 import { useState, useMemo, useCallback } from 'react';
+
 export type Direction = 'desc' | 'asc' | null;
+
 export interface Column<T> {
   key: keyof T;
   label: string;
@@ -7,42 +9,30 @@ export interface Column<T> {
   render?: (value: any, item: T) => React.ReactNode;
   getSortIcon?: (direction: 'asc' | 'desc' | null) => React.ReactNode;
 }
+
 export interface DataTableProps<T> {
   data: T[];
   columns: Column<T>[];
   options?: DataTableOptions;
   loading?: boolean;
   onSelectionChange?: (selectedItems: Set<string | number>) => void;
+  paginationComponent?: React.ReactNode;
   className?: string;
+  totalPages?: number
 }
+
 export interface DataTableOptions {
-  itemsPerPage?: number;
   defaultSortKey?: string;
   defaultSortDirection?: 'asc' | 'desc';
   enableSelection?: boolean;
 }
 
 export interface UseDataTableReturn<T> {
-  // Data
   currentItems: T[];
-  totalItems: number;
-  totalPages: number;
-
-  // Pagination
-  currentPage: number;
-  itemsPerPage: number;
-  goToPage: (page: number) => void;
-  nextPage: () => void;
-  prevPage: () => void;
-  canGoNext: boolean;
-  canGoPrev: boolean;
-
-  // Sorting
   sortKey: keyof T | null;
   sortDirection: 'asc' | 'desc';
   handleSort: (key: keyof T) => void;
 
-  // Selection
   selectedItems: Set<string | number>;
   isSelected: (id: string | number) => boolean;
   toggleSelection: (id: string | number) => void;
@@ -51,7 +41,6 @@ export interface UseDataTableReturn<T> {
   isAllSelected: boolean;
   isIndeterminate: boolean;
 
-  // Utility
   getItemId: (item: T) => string | number;
 }
 
@@ -60,24 +49,18 @@ export function useDataTable<T extends Record<string, any>>(
   options: DataTableOptions = {}
 ): UseDataTableReturn<T> {
   const {
-    itemsPerPage = 10,
     defaultSortKey = null,
     defaultSortDirection = 'asc',
-    enableSelection = false
   } = options;
 
-  // State
-  const [currentPage, setCurrentPage] = useState(1);
   const [sortKey, setSortKey] = useState<keyof T | null>(defaultSortKey as keyof T);
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>(defaultSortDirection);
   const [selectedItems, setSelectedItems] = useState<Set<string | number>>(new Set());
 
-  // Get unique ID for each item (assumes 'id' field exists)
   const getItemId = useCallback((item: T): string | number => {
     return item.id || JSON.stringify(item);
   }, []);
 
-  // Sorted data
   const sortedData = useMemo(() => {
     if (!sortKey) return data;
 
@@ -100,46 +83,23 @@ export function useDataTable<T extends Record<string, any>>(
     });
   }, [data, sortKey, sortDirection]);
 
-  // Pagination calculations
-  const totalItems = sortedData.length;
-  const totalPages = Math.ceil(totalItems / itemsPerPage);
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const endIndex = startIndex + itemsPerPage;
-  const currentItems = sortedData.slice(startIndex, endIndex);
+  const currentItems = sortedData;
 
-  // Pagination functions
-  const goToPage = useCallback((page: number) => {
-    setCurrentPage(Math.max(1, Math.min(page, totalPages)));
-  }, [totalPages]);
-
-  const nextPage = useCallback(() => {
-    goToPage(currentPage + 1);
-  }, [currentPage, goToPage]);
-
-  const prevPage = useCallback(() => {
-    goToPage(currentPage - 1);
-  }, [currentPage, goToPage]);
-
-  const canGoNext = currentPage < totalPages;
-  const canGoPrev = currentPage > 1;
-
-  // Sorting functions
   const handleSort = useCallback((key: keyof T) => {
     if (sortKey === key) {
-      setSortDirection(prev => prev === 'asc' ? 'desc' : 'asc');
+      setSortDirection((prev) => (prev === 'asc' ? 'desc' : 'asc'));
     } else {
       setSortKey(key);
       setSortDirection('asc');
     }
   }, [sortKey]);
 
-  // Selection functions
   const isSelected = useCallback((id: string | number) => {
     return selectedItems.has(id);
   }, [selectedItems]);
 
   const toggleSelection = useCallback((id: string | number) => {
-    setSelectedItems(prev => {
+    setSelectedItems((prev) => {
       const newSet = new Set(prev);
       if (newSet.has(id)) {
         newSet.delete(id);
@@ -159,40 +119,19 @@ export function useDataTable<T extends Record<string, any>>(
     setSelectedItems(new Set());
   }, []);
 
-  // Selection state calculations
   const currentItemIds = new Set(currentItems.map(getItemId));
-  const selectedCurrentItems = Array.from(selectedItems).filter(id => currentItemIds.has(id));
-  const isAllSelected = currentItems.length > 0 && selectedCurrentItems.length === currentItems.length;
-  const isIndeterminate = selectedCurrentItems.length > 0 && selectedCurrentItems.length < currentItems.length;
-
-  // Reset page when data changes
-  useState(() => {
-    if (currentPage > totalPages && totalPages > 0) {
-      setCurrentPage(1);
-    }
-  });
+  const selectedCurrentItems = Array.from(selectedItems).filter((id) => currentItemIds.has(id));
+  const isAllSelected =
+    currentItems.length > 0 && selectedCurrentItems.length === currentItems.length;
+  const isIndeterminate =
+    selectedCurrentItems.length > 0 &&
+    selectedCurrentItems.length < currentItems.length;
 
   return {
-    // Data
     currentItems,
-    totalItems,
-    totalPages,
-
-    // Pagination
-    currentPage,
-    itemsPerPage,
-    goToPage,
-    nextPage,
-    prevPage,
-    canGoNext,
-    canGoPrev,
-
-    // Sorting
     sortKey,
     sortDirection,
     handleSort,
-
-    // Selection
     selectedItems,
     isSelected,
     toggleSelection,
@@ -200,8 +139,6 @@ export function useDataTable<T extends Record<string, any>>(
     clearSelection,
     isAllSelected,
     isIndeterminate,
-
-    // Utility
-    getItemId
+    getItemId,
   };
 }
